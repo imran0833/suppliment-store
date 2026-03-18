@@ -1,30 +1,30 @@
-const login = async () => {
+import { NextResponse } from "next/server";
 
-  const res = await fetch("/api/auth/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      email,
-      password
-    })
-  });
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
 
-  const data = await res.json();
+    const { email, password } = body;
 
-  if (res.ok) {
-
-    localStorage.setItem("user", JSON.stringify(data.user));
-
-    if (data.user.role === "admin") {
-      router.push("/admin/dashboard");
-    } else {
-      router.push("/");
+    // Temporary response (later DB connect karenge)
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: "Email and Password required" },
+        { status: 400 }
+      );
     }
 
-  } else {
-    alert(data.message);
-  }
+    return NextResponse.json({
+      message: "Login API working ✅",
+      user: {
+        email,
+      },
+    });
 
-};
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
+}
