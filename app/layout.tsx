@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { SessionProvider } from "next-auth/react";
 import Footer from "@/components/Footer";
-
+0
 export default function RootLayout({
   children,
 }: {

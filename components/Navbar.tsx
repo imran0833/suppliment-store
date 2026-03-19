@@ -17,8 +17,8 @@ import { useSession, signOut } from "next-auth/react";
 export default function Navbar(){
 
   const [count,setCount] = useState(0);
-  const [open,setOpen] = useState(false);
   const [menu,setMenu] = useState(false);
+  const [open,setOpen] = useState(false);
 
   const dropdownRef = useRef<any>(null);
   const { data: session } = useSession();
@@ -31,49 +31,36 @@ export default function Navbar(){
 
   useEffect(()=>{
     loadCartCount();
-    window.addEventListener("storage",loadCartCount);
   },[]);
-
-  useEffect(() => {
-    const handleClickOutside = (event:any) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-  }, []);
 
   return(
 
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 backdrop-blur-lg bg-white/70 border-b">
 
-      <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
 
         {/* Logo */}
-        <Link href="/" className="text-lg md:text-2xl font-bold">
-          SUPPLEMENT STORE
+        <Link href="/" className="text-xl md:text-2xl font-bold">
+          💪 Store
         </Link>
 
-        {/* Desktop Search */}
-        <div className="hidden md:block">
-          <SearchBar/>
-        </div>
-
-        {/* Desktop Menu */}
+        {/* Desktop */}
         <div className="hidden md:flex items-center gap-6">
 
-          <Link href="/products" className="flex gap-1 items-center">
-            <ShoppingBag size={20}/> Products
+          <SearchBar/>
+
+          <Link href="/products" className="hover:text-black">
+            Products
           </Link>
 
-          <Link href="/wishlist" className="flex gap-1 items-center">
-            <Heart size={20}/> Wishlist
+          <Link href="/wishlist">
+            <Heart size={20}/>
           </Link>
 
-          <Link href="/cart" className="relative flex gap-1 items-center">
-            <ShoppingCart size={20}/> Cart
+          <Link href="/cart" className="relative">
+            <ShoppingCart size={20}/>
             {count > 0 && (
-              <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+              <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs px-2 rounded-full">
                 {count}
               </span>
             )}
@@ -81,31 +68,21 @@ export default function Navbar(){
 
           {/* Account */}
           <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={()=>setOpen(!open)}
-              className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded"
-            >
+            <button onClick={()=>setOpen(!open)} className="bg-black text-white px-3 py-1 rounded-lg" aria-label={session ? "Account menu" : "Open account menu"} title={session ? "Account menu" : "Open account menu"}>
               <User size={18}/>
-              {session ? session.user?.name : "Account"}
             </button>
 
             {open && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
+              <div className="absolute right-0 mt-2 bg-white shadow rounded-lg w-40">
                 {!session ? (
                   <>
-                    <Link href="/login" className="block px-4 py-2">Login</Link>
-                    <Link href="/register" className="block px-4 py-2">Register</Link>
+                    <Link href="/login" className="block p-2">Login</Link>
+                    <Link href="/register" className="block p-2">Register</Link>
                   </>
                 ) : (
-                  <>
-                    <Link href="/profile" className="block px-4 py-2">Profile</Link>
-                    <button
-                      onClick={()=>signOut()}
-                      className="w-full text-left px-4 py-2 text-red-500"
-                    >
-                      Logout
-                    </button>
-                  </>
+                  <button onClick={()=>signOut()} className="block w-full text-left p-2 text-red-500">
+                    Logout
+                  </button>
                 )}
               </div>
             )}
@@ -113,28 +90,19 @@ export default function Navbar(){
 
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={()=>setMenu(!menu)}
-          className="md:hidden"
-          aria-label={menu ? "Close menu" : "Open menu"}
-          title={menu ? "Close menu" : "Open menu"}
-        >
-          <Menu size={24}/>
+        {/* Mobile */}
+        <button className="md:hidden" onClick={()=>setMenu(!menu)} aria-label={menu ? "Close mobile menu" : "Open mobile menu"} title={menu ? "Close mobile menu" : "Open mobile menu"}>
+          <Menu/>
         </button>
 
       </div>
 
-      {/* MOBILE MENU */}
       {menu && (
-        <div className="md:hidden bg-white border-t p-4 flex flex-col gap-4">
-
+        <div className="md:hidden p-4 flex flex-col gap-4 bg-white">
           <SearchBar/>
-
           <Link href="/products">Products</Link>
           <Link href="/wishlist">Wishlist</Link>
           <Link href="/cart">Cart ({count})</Link>
-
         </div>
       )}
 
