@@ -1,151 +1,43 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import ProductCard from "./ProductCard";
 
-export default function ProductCarousel() {
+export default function ProductCarousel(){
 
-  const [products,setProducts] = useState<any[]>([]);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(()=>{
-
-    fetch("/api/product/list")
-    .then(res=>res.json())
-    .then(data=>{
-      if(data.products){
-        setProducts(data.products)
-      }
-    })
-
-  },[])
-
-
-  /* AUTO SCROLL */
-
-  useEffect(()=>{
-
-    const interval = setInterval(()=>{
-
-      if(!scrollRef.current) return;
-
-      scrollRef.current.scrollBy({
-        left:280,
-        behavior:"smooth"
-      })
-
-      const maxScroll =
-        scrollRef.current.scrollWidth -
-        scrollRef.current.clientWidth;
-
-      if(scrollRef.current.scrollLeft >= maxScroll-5){
-
-        scrollRef.current.scrollTo({
-          left:0,
-          behavior:"smooth"
-        })
-
-      }
-
-    },4000)
-
-    return ()=>clearInterval(interval)
-
-  },[])
-
-
-  /* ARROWS */
-
-  const scrollLeft = ()=>{
-    scrollRef.current?.scrollBy({
-      left:-300,
-      behavior:"smooth"
-    })
-  }
-
-  const scrollRight = ()=>{
-    scrollRef.current?.scrollBy({
-      left:300,
-      behavior:"smooth"
-    })
-  }
-
+  const products = [
+    {
+      id:1,
+      name:"Whey Protein",
+      desc:"Muscle gain",
+      price:1999,
+      image:"https://images.unsplash.com/photo-1600180758890-6b94519a8ba5"
+    },
+    {
+      id:2,
+      name:"Creatine",
+      desc:"Strength boost",
+      price:999,
+      image:"https://images.unsplash.com/photo-1594737625785-a6cbdabd333c"
+    },
+    {
+      id:3,
+      name:"Mass Gainer",
+      desc:"Weight gain",
+      price:2499,
+      image:"https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b"
+    },
+  ];
 
   return(
 
-    <div className="relative">
+    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
 
-      {/* LEFT BUTTON */}
-
-      <button
-      onClick={scrollLeft}
-      aria-label="Previous product"
-      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow p-3 rounded-full hover:scale-110 transition"
-      >
-        <ChevronLeft size={26}/>
-      </button>
-
-
-      {/* RIGHT BUTTON */}
-
-      <button
-      onClick={scrollRight}
-      aria-label="Next product"
-      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow p-3 rounded-full hover:scale-110 transition"
-      >
-        <ChevronRight size={26}/>
-      </button>
-
-
-      {/* PRODUCT ROW */}
-
-      <div
-      ref={scrollRef}
-      className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory px-8 py-4 cursor-grab active:cursor-grabbing"
-      >
-
-        {products.map((p:any)=>(
-
-          <Link
-          key={p._id}
-          href={`/products/${p._id}`}
-          className="min-w-[260px] snap-start"
-          >
-
-            <div className="bg-white rounded-xl shadow hover:shadow-2xl transition transform hover:-translate-y-1">
-
-              <img
-                  src={p.image ? p.image : "/no-image.png"}
-className="w-full h-44 object-cover hover:scale-105 transition"
-                />
-
-              <div className="p-4">
-
-                <h3 className="font-semibold text-lg">
-                  {p.name}
-                </h3>
-
-                <p className="text-gray-500 text-sm">
-                  {p.category}
-                </p>
-
-                <p className="font-bold mt-2">
-                  ₹ {p.price}
-                </p>
-
-              </div>
-
-            </div>
-
-          </Link>
-
-        ))}
-
-      </div>
+      {products.map((p)=>(
+        <div key={p.id} className="min-w-[200px]">
+          <ProductCard product={p}/>
+        </div>
+      ))}
 
     </div>
-
   )
-
 }

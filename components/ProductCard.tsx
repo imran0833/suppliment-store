@@ -1,83 +1,66 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { useState } from "react";
 import { addToCart } from "@/utils/cart";
-import { addToWishlist, getWishlist } from "@/utils/wishlist";
+import { motion } from "framer-motion";
 
-export default function ProductCard({ product }: any) {
+export default function ProductCard({ product }: any){
 
-  const [liked, setLiked] = useState(false);
+  const [added,setAdded] = useState(false);
 
-  useEffect(() => {
-    const list = getWishlist();
-    const exists = list.find((p: any) => p._id === product._id);
-    if (exists) setLiked(true);
-  }, [product._id]);
+  const handleCart = () => {
+    addToCart(product);
+    setAdded(true);
 
-  const handleWishlist = (e: any) => {
-    e.stopPropagation();
-    addToWishlist(product);
-    setLiked(true);
+    setTimeout(()=>setAdded(false),1500);
   };
 
-  return (
-    <div className="bg-white/70 backdrop-blur-lg border border-gray-200 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-3 md:p-4 relative group">
+  return(
 
-      {/* Wishlist */}
-      <button
-        onClick={handleWishlist}
-        className="absolute top-3 right-3 bg-white p-2 rounded-full shadow"
-      >
-        <Heart
-          size={18}
-          className={liked ? "text-red-500" : "text-gray-400"}
-          fill={liked ? "red" : "none"}
-        />
-      </button>
+    <motion.div 
+      whileHover={{ scale: 1.05 }}
+      className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-3 relative overflow-hidden"
+    >
 
-      {/* Image */}
-      <Link href={`/products/${product._id}`}>
-        <div className="overflow-hidden rounded-xl">
-          <img
-            src={product.image || "/no-image.png"}
-            className="w-full h-36 md:h-48 object-cover group-hover:scale-110 transition duration-500"
-          />
-        </div>
-      </Link>
+      {/* IMAGE */}
+      <img
+        src={product.image}
+        className="w-full h-36 object-cover rounded-xl"
+      />
 
-      {/* Name */}
-      <Link href={`/products/${product._id}`}>
-        <h3 className="text-sm md:text-lg font-semibold mt-3 line-clamp-2 group-hover:text-blue-600 transition">
-          {product.name}
-        </h3>
-      </Link>
+      {/* TITLE */}
+      <h3 className="mt-3 font-semibold text-sm">
+        {product.name}
+      </h3>
 
-      {/* Rating */}
-      <div className="flex items-center gap-1 mt-1 text-yellow-500">
-        {[...Array(5)].map((_, i) => (
-          <Star key={i} size={14} fill="gold" />
-        ))}
-      </div>
-
-      {/* Price */}
-      <p className="font-bold text-lg mt-1">
-        ₹ {product.price}
+      <p className="text-gray-500 text-xs">
+        {product.desc}
       </p>
 
-      {/* Button */}
+      {/* PRICE */}
+      <p className="font-bold mt-1">
+        ₹{product.price}
+      </p>
+
+      {/* BUTTON */}
       <button
-        onClick={() => {
-          addToCart(product);
-          alert("Added to cart 🛒");
-        }}
-        className="mt-3 w-full bg-black text-white py-2 rounded-xl hover:bg-gray-800 transition flex items-center justify-center gap-2"
+        onClick={handleCart}
+        className="mt-3 w-full bg-black text-white py-2 rounded-xl active:scale-95 transition"
       >
-        <ShoppingCart size={16} />
-        Add To Cart
+        Add to Cart
       </button>
 
-    </div>
-  );
+      {/* ANIMATION */}
+      {added && (
+        <motion.div
+          initial={{ scale:0 }}
+          animate={{ scale:1 }}
+          className="absolute inset-0 bg-green-500/80 flex items-center justify-center text-white font-bold text-lg"
+        >
+          Added ✔
+        </motion.div>
+      )}
+
+    </motion.div>
+  )
 }
