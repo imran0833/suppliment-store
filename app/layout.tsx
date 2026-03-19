@@ -3,8 +3,8 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { SessionProvider } from "next-auth/react";
-import Footer from "@/components/Footer";
-0
+import BottomNav from "@/components/BottomNav";
+
 export default function RootLayout({
   children,
 }: {
@@ -12,12 +12,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-gray-50">
 
         <SessionProvider>
           <Navbar />
-          {children}
-          <Footer />
+
+          {/* MAIN CONTENT */}
+          <div className="pb-20 md:pb-0">
+            {children}
+          </div>
+
+          {/* MOBILE APP NAV */}
+          <BottomNav />
         </SessionProvider>
 
       </body>
