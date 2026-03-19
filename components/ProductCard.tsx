@@ -8,98 +8,78 @@ import { addToWishlist, getWishlist } from "@/utils/wishlist";
 
 export default function ProductCard({ product }: any) {
 
-  const [liked,setLiked] = useState(false);
+  const [liked, setLiked] = useState(false);
 
-  useEffect(()=>{
-
+  useEffect(() => {
     const list = getWishlist();
+    const exists = list.find((p: any) => p._id === product._id);
+    if (exists) setLiked(true);
+  }, [product._id]);
 
-    const exists = list.find((p:any)=>p._id === product._id);
-
-    if(exists){
-      setLiked(true);
-    }
-
-  },[product._id]);
-
-
-  const handleWishlist = (e:any)=>{
+  const handleWishlist = (e: any) => {
     e.stopPropagation();
     addToWishlist(product);
     setLiked(true);
-  }
+  };
 
-  return(
+  const handleAddToCart = () => {
+    addToCart(product);
+    alert("Added to cart 🛒");
+  };
 
-    <div className="bg-white border rounded-lg shadow hover:shadow-xl transition p-4 relative">
+  return (
+    <div className="bg-white border rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 p-3 md:p-4 relative group">
 
-      {/* Wishlist */}
-
+      {/* Wishlist Button */}
       <button
-      onClick={handleWishlist}
-      aria-label="Add to wishlist"
-      className="absolute top-3 right-3 z-10"
+        onClick={handleWishlist}
+        aria-label="Add to wishlist"
+        className="absolute top-2 right-2 md:top-3 md:right-3 z-10 bg-white p-1.5 rounded-full shadow"
       >
         <Heart
-        size={22}
-        className={liked ? "text-red-500" : "text-gray-400"}
-        fill={liked ? "red" : "none"}
+          size={20}
+          className={liked ? "text-red-500" : "text-gray-400"}
+          fill={liked ? "red" : "none"}
         />
       </button>
 
-
-      {/* Image */}
-
+      {/* Product Image */}
       <Link href={`/products/${product._id}`}>
-
-        <img
+        <div className="overflow-hidden rounded-lg">
+          <img
             src={product.image ? product.image : "/no-image.png"}
-            className="w-full h-44 object-cover hover:scale-105 transition"
+            alt={product.name}
+            className="w-full h-32 md:h-44 object-cover transition-transform duration-300 group-hover:scale-105"
           />
-
+        </div>
       </Link>
 
-
-      {/* Name */}
-
+      {/* Product Name */}
       <Link href={`/products/${product._id}`}>
-
-        <h3 className="text-lg font-semibold mt-3 hover:text-blue-600">
+        <h3 className="text-sm md:text-lg font-semibold mt-2 md:mt-3 hover:text-blue-600 line-clamp-2">
           {product.name}
         </h3>
-
       </Link>
 
-
       {/* Rating */}
-
-      <p className="text-yellow-500 text-sm">
+      <p className="text-yellow-500 text-xs md:text-sm mt-1">
         {"⭐".repeat(Math.round(product.rating || 4))}
       </p>
 
-
       {/* Price */}
-
-      <p className="font-bold text-lg mt-1">
+      <p className="font-bold text-base md:text-lg mt-1">
         ₹ {product.price}
       </p>
 
-
-      {/* Cart */}
-
+      {/* Add to Cart Button */}
       <button
-      onClick={()=>{
-        addToCart(product);
-        alert("Added to cart 🛒");
-      }}
-      className="mt-3 w-full bg-black text-white py-2 rounded hover:bg-gray-800 flex items-center justify-center gap-2"
+        onClick={handleAddToCart}
+        className="mt-3 w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 flex items-center justify-center gap-2 text-sm md:text-base"
       >
-        <ShoppingCart size={18}/>
+        <ShoppingCart size={18} />
         Add To Cart
       </button>
 
     </div>
-
-  )
-
+  );
 }
