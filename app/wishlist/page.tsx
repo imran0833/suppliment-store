@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getWishlist, removeFromWishlist } from "@/utils/wishlist";
+import { useEffect,useState } from "react";
+import { getWishlist,removeFromWishlist } from "@/utils/wishlist";
 import { addToCart } from "@/utils/cart";
 
 export default function WishlistPage(){
@@ -14,74 +14,62 @@ export default function WishlistPage(){
 
   useEffect(()=>{
     load();
+
+    const update = () => load();
+    window.addEventListener("storage", update);
+
+    return () => window.removeEventListener("storage", update);
   },[]);
 
   return(
 
-    <div className="max-w-7xl mx-auto px-4 py-6 md:p-10">
+    <div className="max-w-7xl mx-auto px-4 py-6">
 
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6">
         Your Wishlist ❤️
       </h1>
 
       {items.length === 0 && (
-        <p className="text-gray-500 text-center mt-10">
-          No items in wishlist 😔
+        <p className="text-gray-500">
+          😔 No items yet. Start adding products ❤️
         </p>
       )}
 
-      {/* ✅ RESPONSIVE GRID */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
         {items.map((p:any)=>(
 
-          <div
-            key={p._id}
-            className="border p-3 md:p-4 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 bg-white"
-          >
+          <div key={p._id} className="border p-4 rounded-lg shadow">
 
-            {/* Image */}
             <img
-              src={p.image ? p.image : "/no-image.png"}
-              className="w-full h-32 md:h-40 object-cover rounded"
+              src={p.image || "/no-image.png"}
+              className="w-full h-40 object-cover"
             />
 
-            {/* Title */}
-            <h2 className="font-semibold mt-2 text-sm md:text-base line-clamp-2">
-              {p.name}
-            </h2>
+            <h2 className="font-bold mt-2">{p.name}</h2>
 
-            {/* Category */}
-            <p className="text-gray-500 text-xs md:text-sm">
-              {p.category}
-            </p>
+            <p className="text-gray-500">{p.category}</p>
 
-            {/* Price */}
-            <p className="font-bold mt-1 md:mt-2 text-sm md:text-base">
-              ₹ {p.price}
-            </p>
+            <p className="font-bold mt-2">₹ {p.price}</p>
 
-            {/* Buttons */}
-            <div className="flex flex-col md:flex-row gap-2 mt-3">
+            <div className="flex flex-col gap-2 mt-4">
 
-              {/* Add to Cart */}
               <button
                 onClick={()=>{
                   addToCart(p);
                   alert("Added to cart 🛒");
                 }}
-                className="bg-black text-white text-xs md:text-sm px-3 py-2 rounded-lg w-full"
+                className="bg-black text-white px-3 py-2 rounded"
               >
                 Add To Cart
               </button>
 
-              {/* Remove */}
               <button
                 onClick={()=>{
                   removeFromWishlist(p._id);
                   load();
                 }}
-                className="text-red-500 text-xs md:text-sm border border-red-500 px-3 py-2 rounded-lg w-full"
+                className="text-red-500 text-sm"
               >
                 Remove
               </button>
