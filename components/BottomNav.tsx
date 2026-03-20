@@ -1,44 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { Home, ShoppingBag, Heart, ShoppingCart, User } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Home, ShoppingCart, User, Heart } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getCart } from "@/utils/cart";
 
 export default function BottomNav(){
 
-  const path = usePathname();
+  const [count,setCount] = useState(0);
 
-  const navItems = [
-    {name:"Home",icon:Home,link:"/"},
-    {name:"Shop",icon:ShoppingBag,link:"/products"},
-    {name:"Wishlist",icon:Heart,link:"/wishlist"},
-    {name:"Cart",icon:ShoppingCart,link:"/cart"},
-    {name:"Account",icon:User,link:"/profile"},
-  ];
+  useEffect(()=>{
+    const cart = getCart();
+    const total = cart.reduce((s:any,i:any)=> s+i.quantity,0);
+    setCount(total);
+  },[]);
 
   return(
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2 md:hidden z-50">
 
-    <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg flex justify-around items-center py-2 z-50 md:hidden">
+      <Link href="/"><Home/></Link>
+      <Link href="/wishlist"><Heart/></Link>
 
-      {navItems.map((item)=>{
+      <Link href="/cart" className="relative">
+        <ShoppingCart/>
+        {count>0 && (
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
+            {count}
+          </span>
+        )}
+      </Link>
 
-        const Icon = item.icon;
-        const active = path === item.link;
-
-        return(
-          <Link
-            key={item.name}
-            href={item.link}
-            className={`flex flex-col items-center text-xs ${
-              active ? "text-black font-semibold" : "text-gray-400"
-            }`}
-          >
-            <Icon size={20}/>
-            {item.name}
-          </Link>
-        )
-      })}
+      <Link href="/account"><User/></Link>
 
     </div>
-  )
+  );
 }

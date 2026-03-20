@@ -2,27 +2,23 @@
 
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import { SessionProvider } from "next-auth/react";
+import Footer from "@/components/Footer";
 import BottomNav from "@/components/BottomNav";
+import { SessionProvider } from "next-auth/react";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-gray-50">
+      <body>
 
         <SessionProvider>
           <Navbar />
 
-          {/* MAIN CONTENT */}
-          <div className="pb-20 md:pb-0">
+          <main className="min-h-screen">
             {children}
-          </div>
+          </main>
 
-          {/* MOBILE APP NAV */}
+          <Footer />   {/* ✅ wapas add */}
           <BottomNav />
         </SessionProvider>
 
