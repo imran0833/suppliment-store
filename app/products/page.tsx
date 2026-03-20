@@ -85,19 +85,17 @@ export default function ProductsPage(){
             ))}
           </div>
 
-          <label htmlFor="max-price-range" className="font-semibold mb-2 block">
+          <label className="font-semibold mb-2 block">
             Max Price
           </label>
 
           <input
             type="range"
-            id="max-price-range"
             min="0"
             max="10000"
             value={maxPrice}
             onChange={(e)=>setMaxPrice(Number(e.target.value))}
             className="w-full"
-            title={`Set maximum price to ₹ ${maxPrice}`}
           />
 
           <p className="text-sm mt-2">₹ {maxPrice}</p>
