@@ -13,7 +13,6 @@ export default function ProductsPage(){
   const [search,setSearch] = useState("");
 
   useEffect(()=>{
-
     fetch("/api/product/list")
     .then(res=>res.json())
     .then(data=>{
@@ -22,11 +21,9 @@ export default function ProductsPage(){
         setFiltered(data.products);
       }
     })
-
   },[]);
 
   useEffect(()=>{
-
     let temp = [...products];
 
     if(category !== "All"){
@@ -49,58 +46,44 @@ export default function ProductsPage(){
 
   return(
 
-    <div className="max-w-7xl mx-auto p-10">
+    <div className="max-w-7xl mx-auto px-4 py-6">
 
-      <h1 className="text-3xl font-bold mb-8">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6">
         All Supplements
       </h1>
 
-      <div className="grid grid-cols-5 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
 
-        {/* Sidebar */}
+        {/* ✅ Sidebar (hidden on mobile) */}
+        <div className="hidden md:block md:col-span-1 border p-4 rounded shadow h-fit sticky top-24">
 
-        <div className="col-span-1 border p-4 rounded shadow h-fit sticky top-24">
-
-          <h2 className="font-bold mb-4 text-lg">
-            Filters
-          </h2>
-
-          {/* Search */}
+          <h2 className="font-bold mb-4 text-lg">Filters</h2>
 
           <input
-          type="text"
-          placeholder="Search product..."
-          aria-label="Search product"
-          value={search}
-          onChange={(e)=>setSearch(e.target.value)}
-          className="border p-2 w-full rounded mb-4"
+            type="text"
+            placeholder="Search product..."
+            value={search}
+            onChange={(e)=>setSearch(e.target.value)}
+            className="border p-2 w-full rounded mb-4"
           />
 
-          {/* Category */}
-
-          <h3 className="font-semibold mb-2">
-            Category
-          </h3>
+          <h3 className="font-semibold mb-2">Category</h3>
 
           <div className="flex flex-col gap-2 mb-6">
-
             {categories.map((c)=>(
               <button
-              key={c}
-              onClick={()=>setCategory(c)}
-              className={`text-left ${
-                category === c
-                ? "font-bold text-black"
-                : "text-gray-600"
-              }`}
+                key={c}
+                onClick={()=>setCategory(c)}
+                className={`text-left ${
+                  category === c
+                  ? "font-bold text-black"
+                  : "text-gray-600"
+                }`}
               >
                 {c}
               </button>
             ))}
-
           </div>
-
-          {/* Price */}
 
           <label htmlFor="max-price-range" className="font-semibold mb-2 block">
             Max Price
@@ -117,24 +100,14 @@ export default function ProductsPage(){
             title={`Set maximum price to ₹ ${maxPrice}`}
           />
 
-          <p className="text-sm mt-2">
-            ₹ {maxPrice}
-          </p>
-
+          <p className="text-sm mt-2">₹ {maxPrice}</p>
         </div>
 
-
-        {/* Products Grid */}
-
-        <div className="col-span-4 grid grid-cols-4 gap-7">
+        {/* ✅ Products */}
+        <div className="col-span-1 md:col-span-4 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
           {filtered.map((p:any)=>(
-            
-            <ProductCard
-              key={p._id}
-              product={p}
-            />
-
+            <ProductCard key={p._id} product={p}/>
           ))}
 
         </div>
@@ -142,7 +115,5 @@ export default function ProductsPage(){
       </div>
 
     </div>
-
   )
-
 }
