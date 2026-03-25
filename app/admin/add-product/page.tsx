@@ -13,74 +13,121 @@ export default function AddProductPage() {
     description: ""
   });
 
-  const handleSubmit = async (e:any) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
+    setLoading(true);
 
     const res = await fetch("/api/product/add", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form)
     });
 
     const data = await res.json();
-    alert(data.message);
+
+    if (res.ok) {
+      alert("Product Added ✅");
+      setForm({
+        name: "",
+        category: "",
+        price: "",
+        stock: "",
+        image: "",
+        description: ""
+      });
+    } else {
+      alert(data.message || "Error");
+    }
+
+    setLoading(false);
   };
 
   return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
 
-    <div className="max-w-3xl mx-auto p-10">
+      <div className="bg-white shadow-xl rounded-2xl w-full max-w-2xl p-8">
 
-      <h1 className="text-3xl font-bold mb-6">
-        Add Product
-      </h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          Add New Product 🚀
+        </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
 
-        <input
-          placeholder="Product Name"
-          className="border p-2 w-full"
-          onChange={(e)=>setForm({...form,name:e.target.value})}
-        />
+          {/* Product Name */}
+          <input
+            value={form.name}
+            placeholder="Product Name"
+            className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-black"
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
 
-        <input
-          placeholder="Category"
-          className="border p-2 w-full"
-          onChange={(e)=>setForm({...form,category:e.target.value})}
-        />
+          {/* Category */}
+          <select
+            value={form.category}
+            className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-black"
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+            required
+          >
+            <option value="">Select Category</option>
+            <option value="protein">Protein</option>
+            <option value="creatine">Creatine</option>
+            <option value="mass">Mass Gainer</option>
+            <option value="preworkout">Pre Workout</option>
+          </select>
 
-        <input
-          placeholder="Price"
-          className="border p-2 w-full"
-          onChange={(e)=>setForm({...form,price:e.target.value})}
-        />
+          {/* Price */}
+          <input
+            value={form.price}
+            placeholder="Price ₹"
+            type="number"
+            className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-black"
+            onChange={(e) => setForm({ ...form, price: e.target.value })}
+            required
+          />
 
-        <input
-          placeholder="Stock"
-          className="border p-2 w-full"
-          onChange={(e)=>setForm({...form,stock:e.target.value})}
-        />
+          {/* Stock */}
+          <input
+            value={form.stock}
+            placeholder="Stock"
+            type="number"
+            className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-black"
+            onChange={(e) => setForm({ ...form, stock: e.target.value })}
+            required
+          />
 
-        <input
-          placeholder="Image URL"
-          className="border p-2 w-full"
-          onChange={(e)=>setForm({...form,image:e.target.value})}
-        />
+          {/* Image */}
+          <input
+            value={form.image}
+            placeholder="Image URL"
+            className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-black"
+            onChange={(e) => setForm({ ...form, image: e.target.value })}
+            required
+          />
 
-        <textarea
-          placeholder="Description"
-          className="border p-2 w-full"
-          onChange={(e)=>setForm({...form,description:e.target.value})}
-        />
+          {/* Description */}
+          <textarea
+            value={form.description}
+            placeholder="Description"
+            className="border p-3 w-full rounded-lg focus:ring-2 focus:ring-black"
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            required
+          />
 
-        <button className="bg-black text-white px-6 py-2 rounded">
-          Add Product
-        </button>
+          {/* Button */}
+          <button
+            disabled={loading}
+            className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition"
+          >
+            {loading ? "Adding..." : "Add Product"}
+          </button>
 
-      </form>
+        </form>
+
+      </div>
 
     </div>
-
   );
 }

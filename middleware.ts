@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 export async function middleware(req: any) {
+  const { pathname } = req.nextUrl;
+
+  // ✅ ALLOW THIS API (IMPORTANT 🔥)
+  if (pathname === "/api/admin/create-admin") {
+    return NextResponse.next();
+  }
+
   const token = req.cookies.get("token")?.value;
 
   if (!token) {

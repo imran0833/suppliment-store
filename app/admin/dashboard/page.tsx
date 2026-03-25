@@ -3,10 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 
 export default function AdminDashboard() {
 
   const router = useRouter();
+
+  const { data: session, status } = useSession();
 
   const [stats, setStats] = useState({
     sales: 0,
@@ -17,20 +20,22 @@ export default function AdminDashboard() {
 
   useEffect(() => {
 
-    const storedUser = localStorage.getItem("user");
+    // 🔥 WAIT FOR SESSION
+    if (status === "loading") return;
 
-    if (!storedUser) {
-      router.push("/login");
+    // ❌ NOT LOGGED IN
+    if (status === "unauthenticated") {
+      router.push("/admin/login");
       return;
     }
 
-    const user = JSON.parse(storedUser);
-
-    if (user.role !== "admin") {
-      router.push("/login");
+    // ❌ NOT ADMIN
+    if (session?.user?.role !== "admin") {
+      router.push("/admin/login");
       return;
     }
 
+    // ✅ FETCH DATA
     fetch("/api/admin/stats")
       .then(res => res.json())
       .then(data => {
@@ -39,14 +44,10 @@ export default function AdminDashboard() {
         }
       });
 
-  }, []);
+  }, [status, session]);
 
-  const logout = () => {
-
-    localStorage.removeItem("user");
-
-    router.push("/login");
-
+  const logout = async () => {
+    await signOut({ callbackUrl: "/admin/login" });
   };
 
   return (
@@ -54,7 +55,6 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-100">
 
       {/* Top Bar */}
-
       <div className="flex justify-between items-center bg-white shadow px-10 py-4">
 
         <h1 className="text-2xl font-bold">
@@ -70,16 +70,13 @@ export default function AdminDashboard() {
 
       </div>
 
-
       <div className="max-w-7xl mx-auto p-10">
 
         <h2 className="text-3xl font-bold mb-8">
           Dashboard
         </h2>
 
-
         {/* Stats */}
-
         <div className="grid grid-cols-4 gap-6 mb-10">
 
           <div className="bg-white p-6 rounded-lg shadow">
@@ -112,59 +109,40 @@ export default function AdminDashboard() {
 
         </div>
 
-
-        {/* Admin Actions */}
-
+        {/* Actions */}
         <div className="grid grid-cols-3 gap-6">
 
           <Link href="/admin/add-product">
-
             <div className="bg-white border p-6 rounded-lg shadow hover:bg-gray-100 cursor-pointer">
-
               <h3 className="text-lg font-semibold">
                 Add Product
               </h3>
-
               <p className="text-gray-500">
                 Create new supplement
               </p>
-
             </div>
-
           </Link>
 
-
           <Link href="/admin/products">
-
             <div className="bg-white border p-6 rounded-lg shadow hover:bg-gray-100 cursor-pointer">
-
               <h3 className="text-lg font-semibold">
                 Manage Products
               </h3>
-
               <p className="text-gray-500">
                 Edit or delete products
               </p>
-
             </div>
-
           </Link>
 
-
           <Link href="/admin/orders">
-
             <div className="bg-white border p-6 rounded-lg shadow hover:bg-gray-100 cursor-pointer">
-
               <h3 className="text-lg font-semibold">
                 Orders
               </h3>
-
               <p className="text-gray-500">
                 Manage customer orders
               </p>
-
             </div>
-
           </Link>
 
         </div>
@@ -172,6 +150,5 @@ export default function AdminDashboard() {
       </div>
 
     </div>
-
   );
 }

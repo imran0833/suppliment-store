@@ -1,64 +1,72 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
 
   providers: [
-
     CredentialsProvider({
-
       name: "Credentials",
 
       credentials: {
-        email: {},
-        password: {}
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
 
-      async authorize(credentials: any) {
+      async authorize(credentials) {
+        try {
+          await connectDB();
 
-        await connectDB();
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Please enter email and password");
+          }
 
-        if (!credentials?.email || !credentials?.password) {
-          return null;
+          // ✅ find user
+          const user = await User.findOne({
+            email: credentials.email.toLowerCase(),
+          });
+
+          if (!user) {
+            throw new Error("User not found");
+          }
+
+          // ✅ compare password
+          const isMatch = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          if (!isMatch) {
+            throw new Error("Invalid password");
+          }
+
+          // ✅ ONLY ADMIN LOGIN
+          if (user.role !== "admin") {
+            throw new Error("Access denied");
+          }
+
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          };
+
+        } catch (error: any) {
+          throw new Error(error.message);
         }
-
-        // ✅ find user
-        const user = await User.findOne({
-          email: credentials.email
-        });
-
-        if (!user) return null;
-
-        // ✅ check password
-        const isMatch = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-
-        if (!isMatch) return null;
-
-        // ✅ return user (NO password)
-        return {
-          id: user._id.toString(),
-          name: user.name,
-          email: user.email,
-          role: user.role
-        };
-      }
-
-    })
-
+      },
+    }),
   ],
 
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
   },
 
   pages: {
-    signIn: "/login"
+    signIn: "/admin/login", // ✅ your admin login page
   },
 
   callbacks: {
@@ -72,13 +80,16 @@ const handler = NextAuth({
 
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role;
+        session.user.role = token.role as string;
       }
       return session;
-    }
+    },
 
-  }
+  },
 
-});
+  secret: process.env.NEXTAUTH_SECRET,
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
